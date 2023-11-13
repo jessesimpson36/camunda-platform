@@ -6,6 +6,18 @@
 
   "packageRules": [
     {
+      // Disable major version update for all Helm components.
+      "enabled": false,
+      "matchManagers": ["regex"],
+      "matchUpdateTypes": ["major"]
+    },{
+      // Disable minor version update for previous Camunda releases which will only get patch updates.
+      "enabled": false,
+      "matchManagers": ["regex"],
+      "matchPaths": [".env"],
+      "matchBaseBranches": ["/^stable\\/8.0/", "/^stable\\/8.1/", "/^stable\\/8.2/", "/^stable\\/8.3/"],
+      "matchUpdateTypes": ["minor"]
+    },{
       "matchBaseBranches": ["/^stable\\/8.0/"],
       "matchDepNames": ["camunda/operate"],
       "allowedVersions": "<8.1.0",
@@ -62,10 +74,30 @@
       "datasourceTemplate": "docker",
     },
     {
+      // This is mainly used to update Web-Modeler image tag.
+      // section is copied from camunda/camunda-platform-helm
+      "fileMatch": [".env"],
+      "datasourceTemplate":"docker",
+      "matchStrings": [
+        "# renovate: datasource=docker depName=(?<depName>[^\\s]+?)(?: (lookupName|packageName)=(?<packageName>[^\\s]+?))?(?: versioning=(?<versioning>[^\\s]+?))?(?: registryUrl=(?<registryUrl>[^\\s]+?))?\\s*?(tag|imageTag): (?<currentValue>\\S+)"
+      ],
+      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
+    },
+    {
       "fileMatch": [".env", ".keycloak/Dockerfile"],
       "matchStrings": ["KEYCLOAK_SERVER_VERSION\\s*=\\s*(?<currentValue>\\S+)", "KEYCLOAK_VERSION\\s*=\\s*(?<currentValue>\\S+)"],
       "depNameTemplate": "bitnami/keycloak",
       "datasourceTemplate": "docker",
     },
   ],
+  "hostRules": [
+    {
+      "hostType": "docker",
+      "matchHost": "https://registry.camunda.cloud",
+      "username": "ci-distribution",
+      "encrypted": {
+        "password": "wcFMA/xDdHCJBTolARAAmDePuz612z5/1+ELRjEApYQTS5x1+EX6P+VtBAXESKrPIrXaXyhpnLgKPvncia+Eq6kI29PWBmqVmCqqsTF4SQGnXcVBMhpQaz90Bp3TwZ2UWK+D5Ic4Uam1pnp4UZVvKSzT92EGkd9ZCuL0N5zPxJM5Uk+Omcz6ReM6Brag7aLRB8kZbI7mqPUcxtL+ZGKjzlt8sH2C6sdfUZDEcT8tBv++W1F9GgDPl0SksjRm2VP2gbvmqozjP/YSze45whbPWeC6FKpBbGMM6iflb2sf1Q4QhGsnknHWscjtZtMpX1KEHY58peVnTI+2aVoXmjJlJ8hVANacmcmLeQj3EdefsrGTMVg/n+F7+AqY+LuLnS82RY66y8e1GPTgNdGAnItx0dknt9bVPCY76xCCYCM+8+WuTJaf6plDexrYH8LidQDAqaiFdZaWu2jn20PRrVGW6+7c2T+KzJrrGfhCuThVSRezKBTLd+iUylyryOj0YxWy+8GT8BgnU4T630AL70ivDGO9JdtLiwqGpjSoBxjWIibDwNcJiAQfjxrjjEKjsEr6OSPVTyetOQFHht9iVT62rjPdPktkh0fHnTDAGNantHOdT2ROxVho4PvqNHy12AGk/H17+ywXBFuxZkJyENdh4PcyftUhF55DfzWiuKw+BSFisch/9D1OMW0mgxP1zv7SeQER1t5ghlkNo7Q43yJo+yIV/Oaqkw0BLp0fi0oGAQxCdWauMWUxU01V5YrEUXCTydCtect+Jmfi9Y29ZmV14PG9sn8/a9fRnFGlqkyKWGfJPNE40jDOIoTMK0YrjZ22PfTf8e+B0uqMm1v2QN/RlDtLpwrohoKieTw"
+      }
+    }
+  ]
 }

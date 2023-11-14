@@ -24,6 +24,11 @@
     },
     {
       "matchBaseBranches": ["/^stable\\/8.1/"],
+      "matchDepNames": ["camunda/optimize"],
+      "allowedVersions": "<3.10.0",
+    },
+    {
+      "matchBaseBranches": ["/^stable\\/8.1/"],
       "matchDepNames": ["camunda/operate"],
       "allowedVersions": "<8.2.0",
     },
